@@ -12,6 +12,7 @@ mongoose.connect(
     { useNewUrlParser:true,
       useUnifiedTopology:true,
 })
+mongoose.Promise=global.Promise;
 
 app.use(Logger('dev'));
 app.use(bodyParser.urlencoded({
