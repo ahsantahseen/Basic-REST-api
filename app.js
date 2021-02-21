@@ -15,6 +15,7 @@ mongoose.connect(
 mongoose.Promise=global.Promise;
 
 app.use(Logger('dev'));
+app.use('/uploads',express.static('uploads'))
 app.use(bodyParser.urlencoded({
     extended:false
 }))

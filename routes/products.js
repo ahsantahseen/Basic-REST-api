@@ -1,12 +1,36 @@
 const express=require('express')
 const router=express.Router()
-const Product=require('../models/products')
 const mongoose=require('mongoose')
+const multer=require('multer')
 
+
+const storage=multer.diskStorage({
+    destination:function(req,file,cb){
+       cb(null,'./uploads/');
+    },
+    filename:function(req,file,cb){
+          cb(null,new Date().toISOString().replace(/:|\./g,'') +
+          file.originalname)
+    }
+});
+const fileFilter=(req,file,cb)=>{
+    if(file.mimetype==='image/jpeg'||file.mimetype==='image/png'){
+        cb(null,true)
+    }
+    else{
+        cb(new Error('File Cannot Be Stored! Check requirements'),false)
+    }
+}
+const upload=multer({storage:storage,limits:{
+    fileSize:1024*1024*5
+},
+fileFilter:fileFilter,
+});
+const Product=require('../models/products')
 
 router.get('/',(req,res,next)=>{
     Product.find()
-    .select('_id name price')
+    .select('_id name price productImage')
     .exec().then(docs=>{
         if(docs.length>=0){
             const response={
@@ -34,13 +58,13 @@ router.get('/',(req,res,next)=>{
     }
     );
 
-router.post('/',(req,res,next)=>{
-    
+router.post('/',upload.single('productImage'),(req,res,next)=>{
     const product=new Product({
         _id:new mongoose.Types.ObjectId(),
         name:req.body.name,
         price:req.body.price,
-
+        productImage:req.file.path
+         
          
     })
     product.save().then(result=>{
@@ -71,7 +95,7 @@ router.post('/',(req,res,next)=>{
 router.get('/:productID',(req,res,next)=>{
     const id=req.params.productID;
     Product.findById(id)
-    .select('_id name price').exec().then(
+    .select('_id name price productImage').exec().then(
         doc=>{
             if(doc){
             res.status(200).json(
@@ -79,6 +103,7 @@ router.get('/:productID',(req,res,next)=>{
                     _id:doc._id,
                     name:doc.name,
                     price:doc.price,
+                    productImage:doc.productImage,
                     request:{
                         type:'GET',
                         url:'http//localhost:3000/products/'+doc._id
