@@ -22,6 +22,7 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(bodyParser.json())
 
+
 app.use((req,res,next)=>{
     res.header('Access-Control-Allow-Origin','*') //change to your own site if you have one and allow to use it only
     res.header('Access-Control-Allow-Headers',
