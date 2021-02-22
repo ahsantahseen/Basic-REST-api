@@ -6,6 +6,7 @@ const mongoose=require('mongoose')
 
 const productsRoute=require('./routes/products')
 const ordersRoute=require('./routes/orders')
+const userRoute=require('./routes/user')
 
 mongoose.connect(
     "mongodb+srv://ahsantahseen:"+process.env.MONGO_DB_PASSWORD+"@node-rest-api.ga9ns.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
@@ -36,12 +37,14 @@ app.use((req,res,next)=>{
 
 app.use('/products',productsRoute)
 app.use('/orders',ordersRoute)
+app.use('/user',userRoute)
 
 app.use((req,res,next)=>{
     const error=new Error('Not Found!');
     error.stack=404;
     next(error)
 })
+
 app.use((error,req,res,next)=>{
 res.status(error.status || 500)
 res.json({
